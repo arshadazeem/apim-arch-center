@@ -46,7 +46,7 @@ _Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of t
 
 
 1. End User authenticates into an application by providing their credentials such as username and password. The user identity in this case is expected to be either in Azure AD B2C or in a third party identity provider.
-    1. The authentication request goes through Azure Front Door and authenticates against Azure AD B2C configured with a custom domain. Azure AD B2C authenticates the user and returns a bearer token back to the user.
+    1. The authentication request goes through Azure Front Door and authenticates against Azure AD B2C configured with a custom domain. Azure AD B2C authenticates the user and returns a bearer token (JWT) back to the user.
     2. Optionally, if the user credentials are stored in a third party Identity Management Solution, Azure AD B2C federates with the respective system and returns a bearer token back to the user.
 2. User triggers an event that accesses a backend API. This event could be a click of a button on a web application, or a direct call to the backend API's endpoint.
 3. Request goes through Azure Front Door whose backend is mapped to public endpoint of Azure API Management. Azure API Management intercepts the request, and validates the bearer token against Azure Active Directory B2C. This can be implemented on Azure API Management using the the OAuth2 metadata endpoint that's configured as part of it's <validate-jwt /> policy.
@@ -59,8 +59,13 @@ _Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of t
 > Why is each component there?
 > What does it do and why was it necessary?
 
-Example: 
-* [Resource Groups][resource-groups] is a logical container for Azure resources.  We use resource groups to organize everything related to this project in the Azure console.
+TODO: 
+* Azure API Management acts as an API Gateway for all backend APIs. It validates the incoming JWT token. 
+* Azure Active Directory B2C (Azure AD B2C) provides Identity as a Service for Business to Customer Scenarios. In this scenario, Azure AD B2C is the Identity store for end user identity and returns the bearer token (JWT) on successful authentication. It's also the token store that API Management calls into to validate the token
+* Azure Front Door provides layer 7 load balancing capabilities. It is needed to interact with Azure AD B2C over a custom domain.
+* Azure App Service Environment 
+* Azure Kubernetes Service
+* Azure Functions
 
 ## Next steps
 
