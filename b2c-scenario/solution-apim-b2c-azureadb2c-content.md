@@ -33,6 +33,8 @@ Draft:
 
 _Architecture diagram goes here_
 
+![Architecture Diagram ](Protect-APIs-APIM-B2C-AFD.svg)
+
 > Under the architecture diagram, include this sentence and a link to the Visio file or the PowerPoint file: 
 
 _Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of this architecture._
