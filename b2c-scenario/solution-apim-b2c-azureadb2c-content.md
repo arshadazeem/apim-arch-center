@@ -9,14 +9,25 @@
 - A paragraph that describes what the solution does (the domain)
 - A paragraph that contains a brief description of the main Azure services that make up the solution. This paragraph should convey the Azure value proposition, not a complete description of the architecture.
 
+
+Draft:
+As applications and end users interact with backend APIs there is a greater need to protect these backend APIs against malicious users, and/or known users who do not have the right level of permissions to access specific APIs. To protect against unknown users, a token based authentication mechanism is generally considered as a good practice. 
+
+This article talks about a solution to protect backend APIs using Azure API Management, Azure Active Directory B2C, and Azure Front Door.
+
+
+
 ## Potential use cases
 
 > Are there any other use cases or industries where this would be a fit?
 > How similar or different are they to what's in this article?
 
-These other uses cases have similar design patterns:
-
-- List of example use cases
+Draft:
+- Prevent unauthenticated users from accessing backend APIs
+- Prevent unauthorized users from accessing backend APIs
+- Use Azure AD B2C for Federated Authentication with any OAuth, OIDC and SAML providers including 3rd parties such as Ping Identity, CA Siteminder etc.
+- Prevent unintended load on APIs by making use of API Management features such as Throttling, Rate-Limiting, Ip-Filtering.
+- Implement end user authentication using Azure Active Directory B2C
 
 ## Architecture
 
@@ -26,16 +37,18 @@ _Architecture diagram goes here_
 
 _Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of this architecture._
 
-### Dataflow
+### Workflow
 
 > An alternate title for this sub-section is "Workflow" (if data isn't really involved).
 > In this section, include a numbered list that annotates/describes the dataflow or workflow through the solution. Explain what each step does. Start from the user or external data source, and then follow the flow through the rest of the solution (as shown in the diagram).
 
-Examples:
-1. Admin 1 adds, updates, or deletes an entry in Admin 1's fork of the Microsoft 365 config file.
-2. Admin 1 commits and syncs the changes to Admin 1's forked repository.
-3. Admin 1 creates a pull request (PR) to merge the changes to the main repository.
-4. The build pipeline runs on the PR.
+
+1. End User authenticates into an application by providing their credentials such as username and password. The user identity in this case is expected to be either in Azure AD B2C or in a third party identity provider.
+    1. The authentication request goes through Azure Front Door and authenticates against Azure AD B2C configured with a custom domain. Azure AD B2C authenticates the user and returns a bearer token back to the user.
+    2. Optionally, if the user credentials are stored in a third party Identity Management Solution, Azure AD B2C federates with the respective system and returns a bearer token back to the user.
+2. User triggers an event that accesses a backend API. This event could be a click of a button on a web application, or a direct call to the backend API's endpoint.
+3. Request goes through Azure Front Door whose backend is mapped to public endpoint of Azure API Management. Azure API Management intercepts the request, and validates the bearer token against Azure Active Directory B2C. This can be implemented on Azure API Management using the the OAuth2 metadata endpoint that's configured as part of it's <validate-jwt /> policy.
+4. If the token is valid, Azure API Management forwards the request to the appropriate backend API. Otherwise, the request is rejected.
 
 ### Components
 
