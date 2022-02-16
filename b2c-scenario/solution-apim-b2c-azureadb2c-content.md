@@ -46,8 +46,8 @@ _Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of t
 
 
 1. End User authenticates into an application by providing their credentials such as username and password. The user identity in this case is expected to be either in Azure AD B2C or in a third party identity provider.
-    1. The authentication request goes through Azure Front Door and authenticates against Azure AD B2C configured with a custom domain. Azure AD B2C authenticates the user and returns a bearer token (JWT) back to the user.
-    2. Optionally, if the user credentials are stored in a third party Identity Management Solution, Azure AD B2C federates with the respective system and returns a bearer token back to the user.
+    1. The authentication request goes to Azure AD B2C via Azure Front Door where Azure AD B2C is configured with a custom domain for sign-in. Azure AD B2C authenticates the user and returns a bearer token (JWT) back to the user.
+    2. Optionally, if the user credentials are stored in a third party Identity Provider (IdP), Azure AD B2C federates with the respective downstream IdP and returns a bearer token back to the user.
 2. User triggers an event that accesses a backend API. This event could be a click of a button on a web application, or a direct call to the backend API's endpoint.
 3. Request goes through Azure Front Door whose backend is mapped to public endpoint of Azure API Management. Azure API Management intercepts the request, and validates the bearer token against Azure Active Directory B2C. This can be implemented on Azure API Management using the the OAuth2 metadata endpoint that's configured as part of it's validate-jwt policy.
 4. If the token is valid, Azure API Management forwards the request to the appropriate backend API. Otherwise, the request is rejected with a 401 response code.
@@ -59,22 +59,29 @@ _Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of t
 > Why is each component there?
 > What does it do and why was it necessary?
 
-TODO: 
-* Azure API Management acts as an API Gateway for all backend APIs. It validates the incoming JWT token. 
-* Azure Active Directory B2C (Azure AD B2C) provides Identity as a Service for Business to Customer Scenarios. In this scenario, Azure AD B2C is the Identity store for end user identity and returns the bearer token (JWT) on successful authentication. It's also the token store that API Management calls into to validate the token
-* Azure Front Door provides layer 7 load balancing capabilities. It is needed to interact with Azure AD B2C over a custom domain.
+- [Azure Virtual Network](https://azure.microsoft.com/services/virtual-network/) enables many types of Azure resources, such as Azure Virtual Machines (VMs), to securely communicate with each other, the internet, and on-premises networks.
+
+- [Azure Front Door](/azure/frontdoor/front-door-overview) is an application delivery network that provides global load balancing and site acceleration service for web applications. It offers Layer 7 capabilities for your application like SSL offload, path-based routing, fast failover, caching, etc. to improve performance and high-availability of your applications.
+
+- [Azure Application Gateway](https://azure.microsoft.com/services/application-gateway/) is a web traffic load balancer that manages traffic to web applications. Load balancers operate at the transport layer, OSI layer 4 TCP and UDP, and route traffic based on source IP address and port to a destination IP address and port.
+
+- [Azure API Management](https://azure.microsoft.com/services/api-management/) is a hybrid, multi-cloud management platform for APIs across all environments. API Management creates consistent, modern API gateways for existing backend services.
+
+
+just copy and paste these from other architecture center pages. 
+
+* Azure Active Directory B2C (Azure AD B2C) provides Identity as a Service for Business to Customer Scenarios. In this scenario, Azure AD B2C is the Identity store for end user identity and returns the bearer token (JWT) on successful authentication. It's also the token store that API Management calls into to validate the token. Azure AD  
+
 * Azure App Service Environment 
 * Azure Kubernetes Service
 * Azure Functions
+* links in next steps
 
 ## Next steps
 
-> Links to articles on Docs and Learn. Could also be to appropriate sources outside of Docs, such as third-party documentation, GitHub repos, or an official technical blog post.
-
-Examples:
-* [Azure Kubernetes Service (AKS) documentation](/azure/aks)
-* [Azure Machine Learning documentation](/azure/machine-learning)
-* [What are Azure Cognitive Services?](/azure/cognitive-services/what-are-cognitive-services)
+* [Protect APIs with Application Gateway and API Management](/azure/architecture/reference-architectures/apis/protect-apis)
+* [Enable custom domains for Azure Active Directory B2C](/azure/active-directory-b2c/custom-domain?pivots=b2c-custom-policy)
+add more
 
 ## Related resources
 
@@ -84,8 +91,7 @@ Examples:
 
 Related architecture guides:
 
-* [Artificial intelligence (AI) - Architectural overview](/azure/architecture/data-guide/big-data/ai-overview)
-* [Choosing a Microsoft cognitive services technology](/azure/architecture/data-guide/technology-choices/cognitive-services)
+* [Protect APIs with Application Gateway and API Management](/azure/architecture/reference-architectures/apis/protect-apis)
 
 Fully deployable architectures:
 
