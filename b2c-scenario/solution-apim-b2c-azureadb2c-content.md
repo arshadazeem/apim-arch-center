@@ -33,7 +33,7 @@ Draft:
 
 _Architecture diagram goes here_
 
-![Architecture Diagram ](Protect-APIs-APIM-B2C-AFD.svg)
+![Architecture Diagram ](Protect-APIs-APIM-B2C-AFD.png)
 
 > Under the architecture diagram, include this sentence and a link to the Visio file or the PowerPoint file: 
 
