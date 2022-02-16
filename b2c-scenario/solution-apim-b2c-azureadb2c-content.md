@@ -50,7 +50,7 @@ _Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of t
     2. Optionally, if the user credentials are stored in a third party Identity Management Solution, Azure AD B2C federates with the respective system and returns a bearer token back to the user.
 2. User triggers an event that accesses a backend API. This event could be a click of a button on a web application, or a direct call to the backend API's endpoint.
 3. Request goes through Azure Front Door whose backend is mapped to public endpoint of Azure API Management. Azure API Management intercepts the request, and validates the bearer token against Azure Active Directory B2C. This can be implemented on Azure API Management using the the OAuth2 metadata endpoint that's configured as part of it's validate-jwt policy.
-4. If the token is valid, Azure API Management forwards the request to the appropriate backend API. Otherwise, the request is rejected.
+4. If the token is valid, Azure API Management forwards the request to the appropriate backend API. Otherwise, the request is rejected with a 401 response code.
 
 ### Components
 
