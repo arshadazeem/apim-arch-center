@@ -1,63 +1,34 @@
-> The H1 title is a noun phrase that describes the scenario. Don't enter it here, but as the **name** value in the corresponding YML file.> 
-> Include the solution idea header note at the top of the solution idea. This adds clarification why this is a scaled-back architecture (and provides consistency with our other SIs)...
-
 [!INCLUDE [header_file](../../../includes/sol-idea-header.md)]
 
-> Introductory section (no heading)
-> The introduction contains:
 
-- A paragraph that describes what the solution does (the domain)
-- A paragraph that contains a brief description of the main Azure services that make up the solution. This paragraph should convey the Azure value proposition, not a complete description of the architecture.
+As client applications and end users interact with backend APIs there is a greater need to protect these backend APIs against malicious users, or against users without the appropriate permissions to access specific APIs. Azure API Management Gateway sits between the clients and backend APIs, and acts as a layer of protection for the backend APIs. It provides features such as token validation, claims based authorization, SSL certificate validation, IP restrictions, throttling, rate limiting, request/response validation and many others. Clients can authenticate using any Identity Provider (Microsoft or third party) and use the [validate-jwt](https://docs.microsoft.com/en-us/azure/api-management/api-management-access-restriction-policies#ValidateJWT) policy within API Management to validate the ID token before accessing the backend APIs. The validate-jwt policy uses the OpenID Configuration metadata from the discovery endpoint (/.well-known/) published by the OpenID server.
 
-
-Draft:
-As applications and end users interact with backend APIs there is a greater need to protect these backend APIs against malicious users, and/or known users who do not have the right level of permissions to access specific APIs. To protect against unknown users, a token based authentication mechanism is generally considered as a good practice. 
-
-This article talks about a solution to protect backend APIs using Azure API Management, Azure Active Directory B2C, and Azure Front Door.
-
-
+This article talks about a solution to protect backend APIs using Azure API Management, Azure Active Directory B2C (Azure AD B2C), and Azure Front Door. Although Azure AD B2C is used here, any other Identity Provider that supports OpenID Connect can be used as well. In cases where authentication is managed through other Identity protocols such as SAML, Azure AD B2C can be used to setup Federation with SAML 2.0 Identity Providers.
 
 ## Potential use cases
 
-> Are there any other use cases or industries where this would be a fit?
-> How similar or different are they to what's in this article?
-
-Draft:
 - Prevent unauthenticated users from accessing backend APIs
 - Prevent unauthorized users from accessing backend APIs
-- Use Azure AD B2C for Federated Authentication with any OAuth, OIDC and SAML providers including 3rd parties such as Ping Identity, CA Siteminder etc.
-- Prevent unintended load on APIs by making use of API Management features such as Throttling, Rate-Limiting, Ip-Filtering.
+- Use Azure AD B2C for Federated Authentication with any OpenID Connect and SAML providers including 3rd parties such as Ping Identity, CA Siteminder etc
+- Prevent unintended load on APIs by making use of API Management features such as Throttling, Rate-Limiting, Ip-Filtering
 - Implement end user authentication using Azure Active Directory B2C
 
 ## Architecture
 
-_Architecture diagram goes here_
-
 ![Architecture Diagram ](Protect-APIs-APIM-B2C-AFD.png)
 
-> Under the architecture diagram, include this sentence and a link to the Visio file or the PowerPoint file: 
-
-_Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of this architecture._
+Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of this architecture.
 
 ### Workflow
 
-> An alternate title for this sub-section is "Workflow" (if data isn't really involved).
-> In this section, include a numbered list that annotates/describes the dataflow or workflow through the solution. Explain what each step does. Start from the user or external data source, and then follow the flow through the rest of the solution (as shown in the diagram).
-
-
-1. End User authenticates into an application by providing their credentials such as username and password. The user identity in this case is expected to be either in Azure AD B2C or in a third party identity provider.
+1. End User authenticates into an application by providing their credentials such as username and password. The user identity in this case is expected to be either in Azure AD B2C or in a third party Identity Provider.
     1. The authentication request goes to Azure AD B2C via Azure Front Door where Azure AD B2C is configured with a custom domain for sign-in. Azure AD B2C authenticates the user and returns a bearer token (JWT) back to the user.
-    2. Optionally, if the user credentials are stored in a third party Identity Provider (IdP), Azure AD B2C federates with the respective downstream IdP and returns a bearer token back to the user.
+    2. Optionally, if the user credentials are stored in a third party Identity Provider, Azure AD B2C federates with the respective downstream Identity Provider and returns a bearer token back to the user.
 2. User triggers an event that accesses a backend API. This event could be a click of a button on a web application, or a direct call to the backend API's endpoint.
-3. Request goes through Azure Front Door whose backend is mapped to public endpoint of Azure API Management. Azure API Management intercepts the request, and validates the bearer token against Azure Active Directory B2C. This can be implemented on Azure API Management using the the OAuth2 metadata endpoint that's configured as part of it's validate-jwt policy.
+3. Request goes through Azure Front Door whose backend is mapped to the public endpoint of Azure API Management. Azure API Management intercepts the request, and validates the bearer token against Azure Active Directory B2C. This can be implemented on Azure API Management using the the OpenID Configuration metadata endpoint (./well-known) that's configured as part of it's validate-jwt policy.
 4. If the token is valid, Azure API Management forwards the request to the appropriate backend API. Otherwise, the request is rejected with a 401 response code.
 
 ### Components
-
-> A bullet list of components in the architecture (including all relevant Azure services) with links to the product service pages. This is for lead generation (what business, marketing, and PG want). It helps drive revenue.
-
-> Why is each component there?
-> What does it do and why was it necessary?
 
 - [Azure Virtual Network](https://azure.microsoft.com/services/virtual-network/) enables many types of Azure resources, such as Azure Virtual Machines (VMs), to securely communicate with each other, the internet, and on-premises networks.
 
@@ -67,34 +38,23 @@ _Download a [Visio file](https://arch-center.azureedge.net/[filename].vsdx) of t
 
 - [Azure API Management](https://azure.microsoft.com/services/api-management/) is a hybrid, multi-cloud management platform for APIs across all environments. API Management creates consistent, modern API gateways for existing backend services.
 
+- [Azure Active Directory B2C (Azure AD B2C)](https://azure.microsoft.com/en-us/services/active-directory/external-identities/b2c/) provides Identity as a Service for Business to Customer Scenarios. In this scenario, Azure AD B2C is the Identity store for end user identity and returns the bearer token (JWT) on successful authentication. API Management validates the token using Azure AD B2C's OpenID Configuration Metadata endpoint.
 
-just copy and paste these from other architecture center pages. 
+- [Azure App Service Environment](https://docs.microsoft.com/en-us/azure/app-service/environment/) enables hosting of applications in a fully isolated and dedicated environment for securely running App Service apps at high scale.
 
-* Azure Active Directory B2C (Azure AD B2C) provides Identity as a Service for Business to Customer Scenarios. In this scenario, Azure AD B2C is the Identity store for end user identity and returns the bearer token (JWT) on successful authentication. It's also the token store that API Management calls into to validate the token. Azure AD  
+- [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service/#features) is a Microsoft managed Kubernetes Environment that helps run containerized applications.
 
-* Azure App Service Environment 
-* Azure Kubernetes Service
-* Azure Functions
-* links in next steps
+- [Azure Functions](https://azure.microsoft.com/en-us/services/functions/) is a serverless environment that provides all the continually updated infrastructure and resources needed to run your applications.
+
 
 ## Next steps
 
 * [Protect APIs with Application Gateway and API Management](/azure/architecture/reference-architectures/apis/protect-apis)
 * [Enable custom domains for Azure Active Directory B2C](/azure/active-directory-b2c/custom-domain?pivots=b2c-custom-policy)
 add more
-
+* [Protect backend APIs using Azure AD B2C and API Management](https://docs.microsoft.com/en-us/azure/api-management/howto-protect-backend-frontend-azure-ad-b2c)
 ## Related resources
-
-> Use "Related resources" for related architecture guides and architectures (content on the Azure Architecture Center).
-
-> Here are example sections:
 
 Related architecture guides:
 
 * [Protect APIs with Application Gateway and API Management](/azure/architecture/reference-architectures/apis/protect-apis)
-
-Fully deployable architectures:
-
-* [Chatbot for hotel reservations](/azure/architecture/example-scenario/ai/commerce-chatbot)
-* [Build an enterprise-grade conversational bot](/azure/architecture/reference-architectures/ai/conversational-bot)
-* [Speech-to-text conversion](/azure/architecture/reference-architectures/ai/speech-ai-ingestion)
